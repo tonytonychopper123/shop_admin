@@ -4,7 +4,7 @@
       <div class="logo"></div>
       <div class="logout">
         欢迎光临
-        <a href="#">退出</a>
+        <a href="#" @click="logout">退出</a>
       </div>
       <h1 class="title">电商管理系统后台</h1>
     </el-header>
@@ -16,7 +16,14 @@
 </template>
 
 <script>
-export default {}
+export default {
+    methods: {
+        logout() {
+            localStorage.removeItem('token')
+            this.$router.push('/login')
+        }
+    }
+}
 </script>
 
 <style lang="less" scoped>
