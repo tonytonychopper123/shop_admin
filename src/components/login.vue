@@ -1,5 +1,5 @@
 <template>
-<el-form ref="form" :model="form" status-icon label-width="80px" class="login" :rules="rules">
+<el-form ref="form" :model="form" status-icon label-width="80px" class="login" :rules="rules" hide-required-asterisk>
   <img src="../../static/IMG_3339.jpg" alt="">
   <el-form-item label="用户名" prop="username">
     <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
