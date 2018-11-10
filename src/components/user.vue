@@ -10,7 +10,7 @@
       <el-input placeholder="请输入内容" v-model="query" class="input-with-select">
         <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
       </el-input>
-      <el-button type="success" plain @click="add">添加用户</el-button>
+      <el-button type="success" plain  @click="dialogFormVisible = true">添加用户</el-button>
     </div>
     <!-- 表格 -->
       <el-table
@@ -56,6 +56,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页器 -->
     <el-pagination
         background
         @size-change="handleSizeChange"
@@ -66,6 +67,27 @@
         layout="sizes, prev, pager, next, jumper, total"
         :total="total">
     </el-pagination>
+    <!-- 弹出添加对话框 -->
+    <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
+      <el-form :model="form" :rules="rules" ref="form">
+        <el-form-item label="用户名" :label-width="formLabelWidth" prop="username" required>
+          <el-input v-model="form.username" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" :label-width="formLabelWidth" prop="password" required>
+          <el-input v-model="form.password" autocomplete="off"></el-input>
+        </el-form-item>
+         <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
+          <el-input v-model="form.email" autocomplete="off"></el-input>
+        </el-form-item>
+         <el-form-item label="手机" :label-width="formLabelWidth" prop="mobile">
+          <el-input v-model="form.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="add">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -78,7 +100,82 @@ export default {
             query: '',
             pagenum: 1,
             pagesize: 2,
-            total: 0
+            total: 0,
+            gridData: [
+                {
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                },
+                {
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                },
+                {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                },
+                {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }
+            ],
+            dialogTableVisible: false,
+            dialogFormVisible: false,
+            form: {
+                username: '',
+                password: '',
+                email: '',
+                mobile: ''
+            },
+            formLabelWidth: '120px',
+            rules: {
+                username: [
+                    {
+                        requied: true,
+                        message: '请输入用户名',
+                        trigger: 'change'
+                    },
+                    {
+                        min: 3,
+                        max: 6,
+                        message: '长度在3-6位',
+                        trigger: 'change'
+                    }
+                ],
+                password: [
+                    {
+                        requied: true,
+                        message: '请输入密码',
+                        trigger: 'change'
+                    },
+                    {
+                        min: 6,
+                        max: 12,
+                        message: '长度在6-12位',
+                        trigger: 'change'
+                    }
+                ],
+                email: [
+                    {
+                        min: 6,
+                        max: 12,
+                        message: '长度在6-12位',
+                        trigger: 'change'
+                    }
+                ],
+                mobile: [
+                    {
+                        min: 11,
+                        max: 11,
+                        message: '长度11位',
+                        trigger: 'change'
+                    }
+                ]
+            }
         }
     },
     methods: {
@@ -116,25 +213,64 @@ export default {
         },
         // 删除一条数据
         del(id) {
-            axios({
-                method: 'delete',
-                url: `http://localhost:8888/api/private/v1/users/${id}`,
-                headers: { Authorization: localStorage.getItem('token') }
-            }).then(data => {
-                if (data.data.meta.status === 200) {
-                    if (this.userList.length === 1 && this.pagenum > 1) {
-                        this.pagenum--
-                    }
-                    this.getUsers()
-                }
+            this.$confirm('确定要删除吗?', '温馨提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
             })
+                .then(() => {
+                    axios({
+                        method: 'delete',
+                        url: `http://localhost:8888/api/private/v1/users/${id}`,
+                        headers: {
+                            Authorization: localStorage.getItem('token')
+                        }
+                    }).then(data => {
+                        if (data.data.meta.status === 200) {
+                            if (
+                                this.userList.length === 1 &&
+                                this.pagenum > 1
+                            ) {
+                                this.pagenum--
+                            }
+                            this.$message.success('删除成功!')
+                            this.getUsers()
+                        }
+                    })
+                })
+                .catch(() => {
+                    this.$message.error('取消删除!')
+                })
         },
         // 查询数据
         search() {
             this.pagenum = 1
             this.getUsers()
-        }
+        },
         // 添加用户
+        add() {
+            this.$refs.form.validate(flag => {
+                if (flag) {
+                    axios({
+                        method: 'post',
+                        url: 'http://localhost:8888/api/private/v1/users',
+                        data: this.form,
+                        headers: {
+                            Authorization: localStorage.getItem('token')
+                        }
+                    }).then(data => {
+                        console.log(data)
+                        if (data.data.meta.status === 201) {
+                            this.$message.success('添加成功')
+                            this.$refs.form.resetFields()
+                            this.dialogFormVisible = false
+                            this.pagenum = 1
+                            this.getUsers()
+                        }
+                    })
+                }
+            })
+        }
     },
     created() {
         this.getUsers()
