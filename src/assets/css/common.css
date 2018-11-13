@@ -13,3 +13,8 @@ body {
 #app {
   height: 100%;
 }
+/* 面包屑导航样式 */
+.el-breadcrumb {
+  padding: 15px;
+  background-color: #d4dae0;
+}

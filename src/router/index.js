@@ -4,6 +4,7 @@ import Login from '@/components/login'
 import Home from '@/components/home'
 import User from '@/components/user'
 import Right from '@/components/right'
+import Roles from '@/components/roles'
 Vue.use(VueRouter)
 const router = new VueRouter({
   routes: [
@@ -20,7 +21,8 @@ const router = new VueRouter({
       component: Home,
       children: [
         { path: 'user', component: User },
-        { path: '/right', component: Right }
+        { path: '/right', component: Right },
+        { path: '/roles', component: Roles }
       ]
     }
   ]

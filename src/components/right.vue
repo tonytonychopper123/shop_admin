@@ -68,9 +68,5 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-.el-breadcrumb {
-    padding: 15px;
-    background-color: #d4dae0;
-}
+<style>
 </style>
