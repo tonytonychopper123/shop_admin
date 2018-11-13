@@ -69,7 +69,7 @@
     </el-table-column>
     <el-table-column label="操作">
       <template slot-scope="scope">
-        <el-button plain type="primary" icon="el-icon-edit" size="small"></el-button>
+        <el-button plain type="primary" icon="el-icon-edit" size="small" @click="showEdit(scope.row)"></el-button>
         <el-button plain type="danger" icon="el-icon-delete" size="small" @click="del(scope.row)"></el-button>
         <el-button plain type="success" icon="el-icon-check" size="small" @click="showRight(scope.row)">分配角色</el-button>
       </template>
@@ -108,6 +108,22 @@
       <el-button type="primary" @click="add">确定</el-button>
     </div>
   </el-dialog>
+  <!-- 编辑角色对话框 -->
+  <el-dialog title="编辑角色" :visible.sync="dialogEditFormVisible">
+    <el-form ref="editForm" :model="editForm" :rules="rules" label-width="80px">
+      <el-form-item label="角色名称" prop="roleName">
+        <el-input v-model="editForm.roleName"></el-input>
+      </el-form-item>
+      <el-form-item label="角色描述">
+        <el-input v-model="editForm.roleDesc"></el-input>
+      </el-form-item>
+    </el-form>
+    <!-- 按钮 -->
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="dialogEditFormVisible = false">取 消</el-button>
+      <el-button type="primary" @click="edit">确定</el-button>
+    </div>
+  </el-dialog>
 </div>
 </template>
 
@@ -129,10 +145,9 @@ export default {
             // 权限列表
             rightList: [],
             // 表单数据
-            form: {
-                roleName: '',
-                roleDesc: ''
-            },
+            form: {},
+            // 编辑表单数据
+            editForm: {},
             // 验证规则
             rules: {
                 roleName: [
@@ -145,6 +160,7 @@ export default {
             },
             dialogRoleVisible: false,
             dialogFormVisible: false,
+            dialogEditFormVisible: false,
             // 树形结构的属性
             defaultProps: {
                 children: 'children',
@@ -256,6 +272,35 @@ export default {
                 this.$message.success('恭喜,添加成功')
                 this.$refs.form.resetFields()
                 this.dialogFormVisible = false
+                this.getList()
+            }
+        },
+        // 弹出编辑对话框是发送查询ajax
+        async showEdit(role) {
+            this.dialogEditFormVisible = true
+            this.roleid = role.id
+            let res = await this.axios.get(`roles/${role.id}`)
+            let {
+                data,
+                meta: { status }
+            } = res
+            if (status === 200) {
+                this.editForm = data
+            }
+        },
+        // 编辑确定后发送请求
+        async edit() {
+            let res = await this.axios.put(
+                `roles/${this.roleid}`,
+                this.editForm
+            )
+            let {
+                meta: { status }
+            } = res
+            if (status === 200) {
+                this.$message.success('恭喜,编辑角色成功')
+                this.dialogEditFormVisible = false
+                this.$refs.editForm.resetFields()
                 this.getList()
             }
         }
