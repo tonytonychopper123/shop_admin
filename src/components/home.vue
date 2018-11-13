@@ -28,10 +28,14 @@
                 <el-menu-item index="home/user">用户列表</el-menu-item>
             </el-submenu>
 
-            <el-menu-item index="2">
-              <i class="el-icon-menu"></i>
-              <span slot="title">权限管理</span>
-            </el-menu-item>
+            <el-submenu index="2">
+               <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>权限管理</span>
+              </template>
+              <el-menu-item index="home/roles">角色列表</el-menu-item>
+              <el-menu-item index="/right">权限列表</el-menu-item>
+            </el-submenu>
 
             <el-menu-item index="3">
               <i class="el-icon-document"></i>

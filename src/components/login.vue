@@ -65,12 +65,12 @@ export default {
                             password: this.form.password
                         }
                     }).then(res => {
-                        if (res.data.meta.status === 200) {
-                            this.$message.success(res.data.meta.msg)
-                            localStorage.setItem('token', res.data.data.token)
+                        if (res.meta.status === 200) {
+                            this.$message.success(res.meta.msg)
+                            localStorage.setItem('token', res.data.token)
                             this.$router.push('/home')
                         } else {
-                            this.$message.error(res.data.meta.msg)
+                            this.$message.error(res.meta.msg)
                         }
                     })
                 } else {
