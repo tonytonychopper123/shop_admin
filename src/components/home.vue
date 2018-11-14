@@ -20,37 +20,13 @@
             router
             text-color="#fff"
             active-text-color="#ffd04b">
-            <el-submenu index="1">
+            <el-submenu v-for="menus in menuList" :key="menus.id" :index="menus.path">
               <template slot="title">
                 <i class="el-icon-location"></i>
-                <span>用户管理</span>
+                <span>{{menus.authName}}</span>
               </template>
-                <el-menu-item index="home/user">用户列表</el-menu-item>
+                <el-menu-item :index="item.path" v-for="item in menus.children" :key="item.id">{{item.authName}}</el-menu-item>
             </el-submenu>
-
-            <el-submenu index="2">
-               <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>权限管理</span>
-              </template>
-              <el-menu-item index="/roles">角色列表</el-menu-item>
-              <el-menu-item index="/right">权限列表</el-menu-item>
-            </el-submenu>
-
-            <el-menu-item index="3">
-              <i class="el-icon-document"></i>
-              <span slot="title">商品管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="4">
-              <i class="el-icon-setting"></i>
-              <span slot="title">订单管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="5">
-              <i class="el-icon-setting"></i>
-              <span slot="title">数据统计</span>
-            </el-menu-item>
           </el-menu>
       </el-aside>
       <!-- 主体区域 -->
@@ -63,7 +39,13 @@
 
 <script>
 export default {
+    data() {
+        return {
+            menuList: []
+        }
+    },
     methods: {
+        // 登陆功能
         logout() {
             this.$confirm('确定要推出吗?', '温馨提示', {
                 confirmButtonText: '确定',
@@ -78,7 +60,16 @@ export default {
                 .catch(() => {
                     this.$message.error('取消退出!')
                 })
+        },
+        // 获取菜单权限
+        async getList() {
+            let res = await this.axios.get('menus')
+            let { data } = res
+            this.menuList = data
         }
+    },
+    created() {
+        this.getList()
     }
 }
 </script>
