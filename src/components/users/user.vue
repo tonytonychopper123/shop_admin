@@ -131,7 +131,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogAssignVisible = false">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
+        <el-button type="primary" @click="assign">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -148,7 +148,8 @@ export default {
             total: 0,
             assignForm: {
                 username: '',
-                roleid: ''
+                roleid: '',
+                id: ''
             },
             // 控制添加对话框弹出
             dialogFormVisible: false,
@@ -246,7 +247,6 @@ export default {
             let res = await this.axios.get('roles')
             let { data } = res
             this.options = data
-            console.log(res)
         },
         // 点击每页条数
         handleSizeChange(val) {
@@ -350,10 +350,35 @@ export default {
                 }
             })
         },
+        // 展示分配对话框
         async showAssign(role) {
             this.dialogAssignVisible = true
             this.assignForm.username = role.username
+            this.assignForm.id = role.id
             this.getRoles()
+            let res = await this.axios.get(`users/${role.id}`)
+            let {
+                data: { rid }
+            } = res
+            if (rid === -1) {
+                rid = ''
+            }
+            this.assignForm.roleid = rid
+        },
+        // 确定分配角色
+        async assign() {
+            let res = await this.axios.put(`users/${this.assignForm.id}/role`, {
+                rid: this.assignForm.roleid
+            })
+            let {
+                meta: { status }
+            } = res
+            console.log(res)
+            if (status === 200) {
+                this.$message.success('恭喜,分配角色成功')
+                this.dialogAssignVisible = false
+                this.getRoles()
+            }
         }
     },
     created() {
